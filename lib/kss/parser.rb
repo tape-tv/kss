@@ -14,7 +14,13 @@ module Kss
       @sections = {}
 
       paths_or_strings.each do |path_or_string|
-        if Dir.exists?(path_or_string)
+        if File.file?(path_or_string)
+          parser = CommentParser.new(path_or_string)
+
+          parser.blocks.each do |comment_block|
+            add_section comment_block, path_or_string if self.class.kss_block?(comment_block)
+          end
+        elsif Dir.exists?(path_or_string)
           # argument is a path
           path = path_or_string
           Dir["#{path}/**/*.{css,less,sass,scss}"].each do |filename|
